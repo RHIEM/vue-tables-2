@@ -51,7 +51,7 @@ function getRange(device, operator) {
     tabletP: [480, 768],
     mobileL: [320, 480],
     mobileP: [0, 320],
-    none: [1, 0]
+    none: [2048, 100]
   };
 
   switch (operator) {
