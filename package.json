@@ -24,6 +24,7 @@
     "debounce": "^1.1",
     "merge": "^1.2.0",
     "vue": ">=2.0.0",
+    "vue-cookies": "^1.5.12",
     "vue-pagination-2": "^1.6",
     "vue-resource": "^0.9.0"
   },

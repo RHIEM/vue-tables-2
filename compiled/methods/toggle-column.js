@@ -22,6 +22,8 @@ module.exports = function (column) {
     this.updateState('userControlsColumns', true);
     this.updateState('userColumnsDisplay', this.userColumnsDisplay);
 
+    localStorage[this.name] = this.userColumnsDisplay;
+
     this.$nextTick(function () {
         _this._setFiltersDOM(_this.query);
     });
