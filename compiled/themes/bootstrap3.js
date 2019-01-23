@@ -8,7 +8,7 @@ module.exports = function () {
         column: 'col-md-12',
         label: '',
         input: 'form-control',
-        select: 'form-control',
+        select: 'form-control form-control-inlineblock',
         field: 'form-group',
         inline: 'form-inline',
         right: 'pull-right',
