@@ -21,8 +21,13 @@ module.exports = function (h) {
           "class": this.sortableClass(column) },
         [h(
           "span",
-          { "class": "VueTables__heading", attrs: { title: this.getHeadingTooltip(column, h) }
-          },
+          {
+            directives: [{
+              name: "b-tooltip",
+              value: true
+            }],
+            attrs: { hover: true, title: this.getHeadingTooltip(column, h) },
+            "class": "VueTables__heading" },
           [this.getHeading(column, h)]
         ), sortControl.call(this, column)]
       ));

@@ -20,7 +20,7 @@ module.exports = function () {
         groupTr: 'info',
         button: 'btn btn-secondary',
         dropdown: {
-            container: 'dropdown',
+            container: 'dropdown form-group',
             trigger: 'dropdown-toggle',
             menu: 'dropdown-menu',
             content: '',
