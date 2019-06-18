@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 module.exports = function (h) {
   var _this = this;
@@ -7,33 +7,38 @@ module.exports = function (h) {
     var sortControl = require('./sort-control')(h, right);
 
     var headings = [];
+    //var placement = "{title: 'ddd', placement: 'top'}";
 
-    if (_this.hasChildRow && _this.opts.childRowTogglerFirst) headings.push(h("th"));
+    //var xx = function(){ return {placement: 'top'}};
+    //var me = this;
+
+    if (_this.hasChildRow && _this.opts.childRowTogglerFirst) headings.push(h('th'));
 
     _this.allColumns.map(function (column) {
+      var spanID = 'tt_' + Date.now();
       headings.push(h(
-        "th",
+        'th',
         {
           on: {
-            "click": this.orderByColumn.bind(this, column)
+            'click': this.orderByColumn.bind(this, column)
           },
 
-          "class": this.sortableClass(column) },
+          'class': this.sortableClass(column) },
         [h(
-          "span",
+          'span',
           {
             directives: [{
-              name: "b-tooltip",
+              name: 'b-tooltip',
               value: true
             }],
-            attrs: { hover: true, title: this.getHeadingTooltip(column, h) },
-            "class": "VueTables__heading" },
+            attrs: { title: this.getHeadingTooltip(column, h) },
+            'class': 'VueTables__heading' },
           [this.getHeading(column, h)]
         ), sortControl.call(this, column)]
       ));
     }.bind(_this));
 
-    if (_this.hasChildRow && !_this.opts.childRowTogglerFirst) headings.push(h("th"));
+    if (_this.hasChildRow && !_this.opts.childRowTogglerFirst) headings.push(h('th'));
 
     return headings;
   };
