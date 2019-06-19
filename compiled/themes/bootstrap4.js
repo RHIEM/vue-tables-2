@@ -18,7 +18,8 @@ module.exports = function () {
         nomargin: 'm-0',
         groupTr: 'table-info',
         small: '',
-        button: 'btn btn-secondary',
+        // button: 'btn btn-secondary',
+        button: 'btn btn-info',
         dropdown: {
             container: 'dropdown form-group',
             trigger: 'dropdown-toggle',
