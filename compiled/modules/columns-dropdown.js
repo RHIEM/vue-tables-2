@@ -37,8 +37,7 @@ module.exports = function (h) {
             { ref: 'columnsdropdown', 'class': classes.dropdown.container + ' ' + classes.right + ' VueTables__columns-dropdown' },
             [h(
                 'button',
-                {
-                    attrs: { type: 'button' },
+                { style: 'color:#ffffff', attrs: { type: 'button' },
                     'class': classes.button + ' ' + classes.dropdown.trigger,
                     on: {
                         'click': _this._toggleColumnsDropdown.bind(_this)
