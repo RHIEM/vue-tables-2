@@ -3,6 +3,7 @@ var webpack = require('webpack')
 var env = process.env.NODE_ENV;
 console.log(env);
 module.exports = {
+  mode: env==='production' ? env : 'development',
   entry: './lib/index.js',
   output: {
     path: path.resolve(__dirname, './dist'),
@@ -11,14 +12,21 @@ module.exports = {
     libraryTarget:'var',
     library:'VueTables'
   },
+  resolve:{
+    extensions: [".js",".jsx"]
+  },
+  optimization: {
+    minimize: env==='production'
+  },
   externals: {
     'vue': 'Vue'
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/,
         loader: 'babel-loader',
+        options: { plugins: ['transform-vue-jsx'] },
         exclude: /node_modules/
       }
     ]
@@ -40,18 +48,9 @@ if (env==='production') {
         NODE_ENV: '"production"'
       }
     }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap:false,
-      output:{
-        comments:false
-      },
-      compress: {
-        warnings: false
-      }
-    }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })
   ])
-  
+
 }
