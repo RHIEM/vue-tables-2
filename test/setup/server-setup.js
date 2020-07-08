@@ -25,13 +25,14 @@ beforeEach(()=>{
 			count:data.length
 		}
 	});
-	
+
 	createWrapper();
 
 });
 
 afterEach(()=>{
 	moxios.uninstall(axios);
+	wrapper.destroy();
 });
 
 global.run = function(cb, done, timeout = 0) {
@@ -43,7 +44,7 @@ global.run = function(cb, done, timeout = 0) {
 
 global.requestHas = function(key, value) {
 	var request = moxios.requests.mostRecent();
-	expect(request.config.params[key]).toEqual(value);	
+	expect(request.config.params[key]).toEqual(value);
 }
 
 
@@ -63,5 +64,8 @@ global.createWrapper = function(options = {}, columns = null, slots = {}) {
 		params.store = new Vuex.Store();
 	}
 
-	global.wrapper = mount(ServerTable.install(Vue, {} ,withVuex()), params);
+	var servertable = ServerTable.install(Vue, {} ,withVuex());
+
+	global.wrapper = mount(servertable, params);
+
 }

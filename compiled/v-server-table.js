@@ -1,47 +1,41 @@
-'use strict';
+"use strict";
 
-var _merge = require('merge');
+var _merge = _interopRequireDefault(require("merge"));
 
-var _merge2 = _interopRequireDefault(_merge);
+var _data2 = _interopRequireDefault(require("./state/data"));
 
-var _data2 = require('./state/data');
+var _vuex = _interopRequireDefault(require("./state/vuex"));
 
-var _data3 = _interopRequireDefault(_data2);
+var _normal = _interopRequireDefault(require("./state/normal"));
 
-var _vuex = require('./state/vuex');
+var _table = _interopRequireDefault(require("./table"));
 
-var _vuex2 = _interopRequireDefault(_vuex);
+var _resizeableColumns = _interopRequireDefault(require("./helpers/resizeable-columns"));
 
-var _normal = require('./state/normal');
+var _VtServerTable = _interopRequireDefault(require("./components/VtServerTable"));
 
-var _normal2 = _interopRequireDefault(_normal);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var _table = require('./table');
+var _data = require("./mixins/data");
 
-var _table2 = _interopRequireDefault(_table);
+var _created = require("./mixins/created");
 
-var _vuePagination = require('vue-pagination-2');
+var provide = require("./mixins/provide");
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var _data = require('./mixins/data');
-var _created = require('./mixins/created');
-
-var templateCompiler = require('./template-compiler');
+var themes = {
+  bootstrap3: require('./themes/bootstrap3')(),
+  bootstrap4: require('./themes/bootstrap4')(),
+  bulma: require('./themes/bulma')()
+};
 
 exports.install = function (Vue, globalOptions, useVuex) {
-  var theme = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'bootstrap3';
-  var template = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 'default';
+  var theme = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "bootstrap3";
+  var componentsOverride = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+  var state = useVuex ? (0, _vuex["default"])("server") : (0, _normal["default"])();
 
-
-  var state = useVuex ? (0, _vuex2.default)('server') : (0, _normal2.default)();
-
-  var server = _merge2.default.recursive(true, (0, _table2.default)(), {
-    name: 'server-table',
-    components: {
-      Pagination: _vuePagination.Pagination
-    },
-    render: templateCompiler.call(this, template, theme),
+  var server = _merge["default"].recursive(true, (0, _table["default"])(), {
+    name: "r-l-server-table",
+    render: require('./components/renderless/RLDataTable'),
     props: {
       columns: {
         type: Array,
@@ -57,13 +51,13 @@ exports.install = function (Vue, globalOptions, useVuex) {
       options: {
         type: Object,
         required: false,
-        default: function _default() {
+        "default": function _default() {
           return {};
         }
       }
     },
+    provide: provide,
     created: function created() {
-
       if (!this.opts.requestFunction && !this.url) {
         throw 'vue-tables-2: you must provide either a "url" prop or a custom request function. Aborting';
       }
@@ -76,45 +70,49 @@ exports.install = function (Vue, globalOptions, useVuex) {
         this.customQueries = this.initCustomFilters();
       }
 
-      this.loadState();
+      if (this.opts.sendInitialRequest) {
+        this.loadState();
+        this.getData(true).then(function (response) {
+          if (typeof response === 'undefined') return;
+          this.setData(response);
+          this.loading = false;
 
-      this.getData(true).then(function (response) {
-
-        this.setData(response);
-
-        this.loading = false;
-
-        if (this.hasDateFilters()) {
-          setTimeout(function () {
-            this.initDateFilters();
-          }.bind(this), 0);
-        }
-      }.bind(this));
+          if (this.hasDateFilters()) {
+            setTimeout(function () {
+              this.initDateFilters();
+            }.bind(this), 0);
+          }
+        }.bind(this));
+      }
     },
     mounted: function mounted() {
+      this._setFiltersDOM(this.query);
 
-      this._setColumnsDropdownCloseListener();
+      if (this.opts.resizableColumns) {
+        (0, _resizeableColumns["default"])(this.$el.querySelector("table"), this.hasChildRow, this.opts.childRowTogglerFirst, this.opts.resizableColumns);
+      } // this._setColumnsDropdownCloseListener();
+
 
       if (this.vuex) return;
-
       this.registerServerFilters();
-
       if (this.options.initialPage) this.setPage(this.options.initialPage, true);
     },
     data: function data() {
-      return _merge2.default.recursive(_data(), {
-        source: 'server',
+      return _merge["default"].recursive(_data(), {
+        source: "server",
         loading: true,
         lastKeyStrokeAt: false,
-        globalOptions: globalOptions
-      }, (0, _data3.default)(useVuex, 'server', this.options.initialPage));
+        globalOptions: globalOptions,
+        componentsOverride: componentsOverride,
+        theme: typeof theme === 'string' ? themes[theme] : theme()
+      }, (0, _data2["default"])(useVuex, "server", this.options.initialPage));
     },
     methods: {
-      refresh: require('./methods/refresh'),
-      getData: require('./methods/get-data'),
-      setData: require('./methods/set-data'),
-      serverSearch: require('./methods/server-search'),
-      registerServerFilters: require('./methods/register-server-filters'),
+      refresh: require("./methods/refresh"),
+      getData: require("./methods/get-data"),
+      setData: require("./methods/set-data"),
+      serverSearch: require("./methods/server-search"),
+      registerServerFilters: require("./methods/register-server-filters"),
       loadState: function loadState() {
         var _this = this;
 
@@ -129,7 +127,7 @@ exports.install = function (Vue, globalOptions, useVuex) {
         var state = JSON.parse(this.storage.getItem(this.stateKey));
 
         if (this.vuex) {
-          this.commit('SET_STATE', {
+          this.commit("SET_STATE", {
             query: state.query,
             customQueries: state.customQueries,
             page: state.page,
@@ -144,9 +142,15 @@ exports.install = function (Vue, globalOptions, useVuex) {
           this.orderBy = state.orderBy;
         }
 
-        if (!this.opts.pagination.dropdown) {
+        if (!this.opts.pagination.dropdown && this.$refs.pagination) {
           setTimeout(function () {
             _this.$refs.pagination.Page = state.page;
+          }, 0);
+        }
+
+        if (this.opts.filterable) {
+          setTimeout(function () {
+            _this._setFiltersDOM(state.query);
           }, 0);
         }
 
@@ -159,16 +163,15 @@ exports.install = function (Vue, globalOptions, useVuex) {
       }
     },
     computed: {
-      totalPages: require('./computed/total-pages'),
-      filteredQuery: require('./computed/filtered-query'),
+      totalPages: require("./computed/total-pages"),
+      filteredQuery: require("./computed/filtered-query"),
       hasMultiSort: function hasMultiSort() {
         return this.opts.serverMultiSorting;
       }
     }
-
   }, state);
 
-  Vue.component('v-server-table', server);
-
-  return server;
+  Vue.component("r-l-server-table", server);
+  Vue.component("v-server-table", _VtServerTable["default"]);
+  return _VtServerTable["default"];
 };
